@@ -1,0 +1,7 @@
+colorama==0.3.9
+nltk==3.4
+pathlib2==2.3.3
+scandir==1.9.0
+singledispatch==3.4.0.3
+six==1.12.0
+wordnet==0.0.1b2
