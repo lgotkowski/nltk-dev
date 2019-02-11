@@ -36,96 +36,10 @@ sentences = ["Happy Fussel, find the big blue tree and take it",
              "Holy Phine find the tree and go there",
              "Holy Phine find the tree and go there and wave your hand"]
 
-# sentences = ["Peter pick up the green hammer.",
-#              "Peter take the brown box",
-#              "Peter got to the golden tree"]
-
-# sentences = ["Justin saw a yellow umbrella.",
-#              "Justin give me the yellow umbrella",
-#              "My brother and Justin went to the dog.",
-#              "The little yellow dog barked at the cat"]
 
 
 for sentence in sentences:
     text_tagged = utils.stanford_pos_tag(sentence)
-    #text_tagged = utils.stanford_named_entity_tag(sentence)
-
-    subjects = []
-    verbs = []
-    objects = []
-
-    #grammar = "NP: {<DT>?<JJ>*<NN>}"
-    grammar = r"""
-      NP: {<DT|JJ|NN.*>+}          # Chunk sequences of DT, JJ, NN
-      VP: {<VB.*>}
-      PP: {<IN><NP>}               # Chunk prepositions followed by NP
-      VP: {<VB.*><NP|PP|CLAUSE>+$} # Chunk verbs and their arguments
-      CLAUSE: {<NP><VP>}           # Chunk NP, VP
-      """
-
-    # grammar = r"""
-    #       NP: {<N.*>}          # Chunk sequences of DT, JJ, NN
-    #       VP: {<V.*>}               # Chunk prepositions followed by NP
-    #       CLAUSE: {<NP><VP>}           # Chunk NP, VP
-    #       """
-
-    grammar = """
-        Adverb: {<RB>}
-        Adject: {<J.*>}
-        Subject: {<N.*>}
-        Action: {<V.*>} 
-        Direction: {<RP>}
-        Description: {<Adverb|Adject>}
-        SubjectDescription: {<Description>*<Subject>}
-        SubjectDescriptions: {<SubjectDescription><CC><SubjectDescription> | <SubjectDescription><,><SubjectDescription> | <SubjectDescription>+}
-        ActionDescription: {<Description>*<Action><Description>*<Direction>*}
-        ActionDescriptions: {<ActionDescription><CC><ActionDescription> | <ActionDescription><,><ActionDescription> | <ActionDescription>+}
-        SubjectActions: {<SubjectDescriptions><.*>*<ActionDescriptions>}
-        Target: {<DT>*<SubjectDescriptions>} 
-        SubjectActionTarget : {<SubjectAction><.*>*<Target>}
-        """
-
-    grammar = """
-            Adverb: {<RB>}
-            Adject: {<J.*>}
-            Subject: {<N.*>}
-            Action: {<V.*>} 
-            Direction: {<RP>}
-            Descriptor: {<Adverb|Adject>}
-            Sequencer: {<CC | ,>}
-            
-            SubjectDescription: {<Descriptor>*<Subject>}
-            ActionDescription: {<Descriptor>*<Action><Descriptor>*<Direction>*}
-            ActionRelation: {<ActionDescription><TO><DT>*<SubjectDescription> | <ActionDescription><DT><SubjectDescription> | <SubjectDescription><PRP><ActionDescription>}
-            
-            ActionSummary: {<ActionRelation | ActionDescription>}
-            
-            SubjectDescriptions: {<SubjectDescription><Sequencer><SubjectDescription> | <SubjectDescription>+}
-            
-            
-            
-            SubjectActions: {<SubjectDescriptions><.*>*<ActionDescriptions>}
-            
-            """
-    # ActionSummaries: {(<ActionSummary><Sequencer><ActionSummary>)+ | <ActionSummary>+ }
-
-    grammar = """
-                Adverb: {<RB>}
-                Adject: {<J.*>}
-                Subject: {<N.*>}
-                Action: {<V.*>} 
-                Direction: {<RP>}
-                Descriptor: {<Adverb|Adject>}
-                Sequencer: {<CC | ,>}
-
-                SubjectDescription: {<Descriptor>*<Subject>}
-                ActionDescription: {<Descriptor>*<Action><Descriptor>*<Direction>*<PRP>*}
-                ActionRelation: {<ActionDescription><TO><DT>*<SubjectDescription><Sequencer><ActionDescription> | <ActionDescription><TO><DT>*<SubjectDescription> | <ActionDescription><DT><SubjectDescription>}
-
-
-                SubjectDescriptions: {<SubjectDescription><Sequencer><SubjectDescription> | <SubjectDescription>+}
-
-                """
 
     grammar = """
                 Adv: {<RB>}
@@ -157,24 +71,10 @@ for sentence in sentences:
     cp = nltk.RegexpParser(grammar)
 
 
-
-
-    for word, tag in text_tagged:
-        if tag.startswith("N") and not verbs:
-            subjects.append(word)
-        elif tag.startswith("V"):
-            verbs.append(word)
-        elif tag.startswith("N") and verbs:
-            objects.append(word)
-
     grammar_result = cp.parse(text_tagged)
 
     print sentence
     print text_tagged
-    print "Subjects: {}".format(subjects)
-    print "Verbs: {}".format(verbs)
-    print "Objects: {}".format(objects)
-
     print "Grammar: {}".format(grammar_result)
     grammar_result.draw()
     print ""
@@ -182,3 +82,9 @@ for sentence in sentences:
 
 
 #print nltk.help.upenn_tagset()
+
+
+# TODO: find the action verbs and match them to the possible actions of the character. (find neares word?)
+# -> same for subjects
+
+# TODO: format the grammar_result in a nicer way to be more intuetive.
